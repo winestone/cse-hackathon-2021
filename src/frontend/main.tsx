@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import ReactDOM from "react-dom";
 
 import * as api from "@common/api";
+import { GameWrapper } from "./pages/Game";
 
 function App(): JSX.Element {
   const [exampleGetResult, setExampleGetResult] = React.useState<string | undefined>();
@@ -26,4 +27,4 @@ function App(): JSX.Element {
   );
 }
 
-ReactDOM.render(<App />, document.getElementById("frontend"));
+ReactDOM.render(<GameWrapper />, document.getElementById("frontend"));
