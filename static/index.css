@@ -19,25 +19,7 @@ body {
 
 
 
-.register-button {
-  background-color:#4ba397;
-  color:white;
-  border:none;
-}
-
-.about-button {
-  background-color:white;
-  color:#a34b51;
-  border:1px solid #a34b51;
-}
-
-.register-button, .about-button {
-  border-radius:5px;
-  margin-right:20px;
-  padding:10px;
-  font-family:'Space Grotesk';
-}
-
+/* register page */
 .register-container {
   background-image:url('./register.png');
   background-color: #a3c6ea;
@@ -55,7 +37,7 @@ body {
   margin-right:100px;
 
 }
-.register-form {
+.register-form, .login-form {
   border:none;
   padding:20px;
   margin-right:20px;
@@ -65,7 +47,7 @@ body {
   font-size:20px;
 }
 
-.register-form input {
+.register-form input, .login-form input {
   background-color:rgb(235, 235, 235);
   border:none;
   color:black;
@@ -74,8 +56,7 @@ body {
 
 }
 
-.register-form-button {
-  background-color:#4ba397;
+.register-form-button, .login-form-button {
   border-radius:5px;
   color:white;
   font-family:'Space Grotesk';
@@ -83,12 +64,20 @@ body {
   padding:10px;
 }
 
+.register-form-button {
+  background-color:#4ba397;
+}
+
+.login-form-button {
+  background-color:#a34b51;
+}
+
 .form-title {
   font-family:'Share Tech Mono';
   font-size:80px;
 }
 
-.register-subtitle {
+.register-subtitle, .login-subtitle {
   font-size:15px;
   font-family:'Space Grotesk';
   margin-bottom:20px;
@@ -98,7 +87,6 @@ body {
 
 .home-container {
   background-image:url('./home.png');
-  background-color: #a3c6ea;
   background-position: left;
   background-repeat: no-repeat;
   background-size: cover;
@@ -119,3 +107,48 @@ body {
   font-size:30px;
   margin-bottom:15px;
 }
+
+/*buttons */
+.register-button:hover {
+  background-color:#4ba397;
+  color:white;
+  border:none;
+}
+
+.register-button {
+  background-color:white;
+  border: 1px solid #4ba397;
+  color:#4ba397;
+}
+
+.about-button {
+  background-color:white;
+  color:#a34b51;
+  border:1px solid #a34b51;
+}
+
+.about-button:hover {
+  background-color:#a34b51;
+  color:white;
+}
+
+.register-button, .about-button {
+  border-radius:5px;
+  margin-right:20px;
+  padding:10px;
+  font-family:'Space Grotesk';
+}
+
+/* LOGIN*/
+.login-container {
+  background-image:url('./login.png');
+  background-position: left;
+  background-repeat: no-repeat;
+  background-size: cover;
+  min-height: 100vh;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+

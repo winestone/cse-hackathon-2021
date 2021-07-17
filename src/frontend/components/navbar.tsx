@@ -4,11 +4,21 @@ import { Link, useHistory } from 'react-router-dom';
 
 
 export default function NavbarComp() {
-  //const [userName, setUserName] = useState('');
+  const [username, setUsername] = useState('');
 //
   let userName = sessionStorage.getItem('username');
   console.log(userName);
   const history = useHistory();
+
+  //window.addEventListener('storage',(e) => {
+  //  console.log('change');
+  //  let user = sessionStorage.getItem('username');
+  //  if (user) {
+  //    setUsername(user);
+  //  } else {
+  //    setUsername('');
+  //  }
+  //})
 
   //Track changes to session storage to re render 
 
@@ -27,12 +37,12 @@ export default function NavbarComp() {
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="mr-auto container-fluid">
             <Nav.Link as={Link} to="/home" className="nav-item">Home</Nav.Link>
-            {!userName && (
+            {username === '' && (
               <>
               <Nav.Link as={Link} to="/login" className="nav-item">Login</Nav.Link>
               </>
             )}
-            {userName && (
+            {username !== '' && (
               <>
               <Button variant="dark" size="sm" name="logOut" className="logout" onClick={handleLogout}> Logout</Button>
             </>
