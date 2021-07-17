@@ -45,6 +45,8 @@ export default function NavbarComp({ username, clearUsername }: NavbarCompProps)
             {!username && (
               <>
               <Nav.Link as={Link} to="/login" className="nav-item">Login</Nav.Link>
+              <Nav.Link as={Link} to="/register" className="nav-item">Register</Nav.Link>
+
               </>
             )}
             {username && (

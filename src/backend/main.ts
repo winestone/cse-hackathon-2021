@@ -7,6 +7,13 @@ app.use(express.json());
 
 let db = new sqlite3.Database('./data.db');
 
+function dbGet<T = any>(sql: string, params: any): Promise<T> {
+  return new Promise((resolve, reject) => db.get(sql, params, (err, row) => {
+    if (err) reject(err);
+    resolve(row);
+  }));
+}
+
 app.get("/api/example", (req, res) => {
   const reply: api.ExampleGetResult = "example reply";
   res.json(reply);
@@ -18,26 +25,23 @@ app.post("/api/example", (req, res) => {
   res.json(reply);
 });
 
-app.post("/api/register", (req, res) => {
+app.post("/api/register", async (req, res) => {
   const args: api.RegisterUsername = req.body; 
   //Check that username doesn't already exist 
-  let successRegister = true;
-  let qry = 'SELECT username FROM users where username = ?';
-  db.get(qry, [args.name], (err, row)=>{
-    if (err){
-      console.log(err);
-      return; 
-    }
-    if (row) {
-      successRegister = false;
-    }
-  }
-  
-  )
-  const reply: api.RegisterResult = { success: successRegister }; 
+  let qry = 'SELECT username FROM users WHERE username = ?';
+  const alreadyRegistered = await dbGet(qry, [args.name]);
+  const reply: api.RegisterResult = { success: !alreadyRegistered }; 
   res.json(reply);
 })
 
+app.post("/api/login", async (req, res) => {
+  const args: api.LoginUsername = req.body; 
+  //Check that username doesn't already exist 
+  let qry = 'SELECT username FROM users WHERE username = ?';
+  const alreadyRegistered = await dbGet(qry, [args.name]);
+  const reply: api.LoginResult = { success: alreadyRegistered }; 
+  res.json(reply);
+})
 
 app.use("/client", (_req, res) => {
   res.sendFile("./static/index.html", { root: "./" });

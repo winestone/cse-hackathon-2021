@@ -10,6 +10,7 @@ export interface RegisterProps {
 export default function Register (props: RegisterProps) {
   const [username, setUsername] = useState(''); 
   const history = useHistory();
+  const [registerErr, setRegisterErr] = useState(false);
 
 
   const handleSubmit = async (event: any) => {
@@ -21,6 +22,9 @@ export default function Register (props: RegisterProps) {
       props.setUsername(username);
       // sessionStorage.setItem('username', username);
       history.push('/profile');  
+      setRegisterErr(false);
+    } else {
+      setRegisterErr(true);
     }
     
 
@@ -46,6 +50,9 @@ export default function Register (props: RegisterProps) {
                 onChange={(e) => setUsername(e.target.value)}
               />          
               </Form.Group>
+              {registerErr && 
+                <h6 className="register-error">Username exists. Choose another</h6>
+              }
             <div className="register-bottom">
             <button className="register-form-button" type="submit">
               Register!

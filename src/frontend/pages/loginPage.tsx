@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Form, Container, Row, Col } from 'react-bootstrap';
 import { useHistory } from 'react-router-dom';
+import * as api from "@common/api";
 
 export interface LoginProps {
   setUsername: (username: string) => void;
@@ -9,14 +10,22 @@ export interface LoginProps {
 export default function Login (props: LoginProps) {
   const [username, setUsername] = useState('');
   const history = useHistory();
+  const [loginErr, setLoginErr] = useState(false);
 
  
-  const handleSubmit = (event:any) => {
+  const handleSubmit = async (event:any) => {
     event.preventDefault();
-    props.setUsername(username);
-    history.push('/home');
+    const res = await api.loginUser({name:username});
+    if (res.success) {
+      props.setUsername(username);
+      history.push('/home');  
+      setLoginErr(false);
+    } else {
+      setLoginErr(true);
+    }
 
     //check with database 
+
   }
 
   return (
@@ -37,6 +46,10 @@ export default function Login (props: LoginProps) {
                 onChange={(e) => setUsername(e.target.value)}
               />          
               </Form.Group>
+              {loginErr && 
+                <h6 className="login-error">Username doesn't exist.</h6>
+              }
+
             <div className="login-bottom">
             <button className="login-form-button" type="submit">
               Login!
