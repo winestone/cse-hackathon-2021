@@ -5,6 +5,7 @@ import Home from './pages/homePage';
 import NavbarComp from './components/navbar';
 import Login from './pages/loginPage';
 import Register from './pages/registerPage';
+import Profile from './pages/profilePage';
 
 import * as api from "@common/api";
 
@@ -47,6 +48,9 @@ function App(): JSX.Element {
           </Route>
           <Route path="/register">
             <Register setUsername={changeUsername}/>
+          </Route>
+          <Route path="/profile"> 
+            <Profile />
           </Route>
           <Route path="/">
             <Home />

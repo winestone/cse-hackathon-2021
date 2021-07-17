@@ -37,7 +37,7 @@ export default function NavbarComp({ username, clearUsername }: NavbarCompProps)
     <>
 
       <Navbar expand="lg" className="navbar-main">
-        <Navbar.Brand as={Link} to="/" className="nav-item"><b>Gamify</b></Navbar.Brand>
+        <Navbar.Brand as={Link} to="/home" className="nav-item"><b>Gamify</b></Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="mr-auto container-fluid">
@@ -49,6 +49,7 @@ export default function NavbarComp({ username, clearUsername }: NavbarCompProps)
             )}
             {username && (
               <>
+              <Nav.Link as={Link} to="/profile" className="nav-item">Profile</Nav.Link>
               <Button variant="dark" size="sm" name="logOut" className="logout" onClick={handleLogout}> Logout</Button>
             </>
             )}

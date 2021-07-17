@@ -14,7 +14,7 @@ export default function Register (props: RegisterProps) {
     event.preventDefault();
     props.setUsername(username);
     // sessionStorage.setItem('username', username);
-    history.push('/home');
+    history.push('/profile');
 
     //Add username to database 
   }
