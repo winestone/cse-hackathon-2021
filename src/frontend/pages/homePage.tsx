@@ -11,6 +11,10 @@ export default function Home() {
     history.push('/register');
   }
 
+  const goToLogin = () => {
+    history.push('/login');
+    
+  }
   return (
     <>
       <Container fluid className="home-container">
@@ -21,7 +25,7 @@ export default function Home() {
             <h3 className="subtitle">Make an account to start playing</h3>
             <div> 
               <button className="register-button" onClick={goToRegister}>Register</button>
-              <button className="about-button">About</button>
+              <button className="about-button" onClick={goToLogin}>Login</button>
             </div>
           </Col>
           <Col md={2}></Col>

@@ -29,6 +29,19 @@ export interface LoginResult{
   success:boolean;
 }
 
+export interface User {
+  name?: string;
+}
+
+export interface userAchievements {
+  achievements: { achievements: string }[];
+}
+
+export async function getUserAchievements(args: User): Promise<userAchievements>{
+  const resp = await axios.post("/api/getUA", args);
+  return resp.data;
+}
+
 export async function examplePost(args: ExamplePostArgs): Promise<ExamplePostResult> {
   const resp = await axios.post("/api/example", args);
   return resp.data;

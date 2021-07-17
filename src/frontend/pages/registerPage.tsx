@@ -17,7 +17,6 @@ export default function Register (props: RegisterProps) {
     event.preventDefault();
 
     const res = await api.registerUser({name:username});
-    console.log(res);
     if (res.success) {
       props.setUsername(username);
       // sessionStorage.setItem('username', username);

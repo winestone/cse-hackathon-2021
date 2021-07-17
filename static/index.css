@@ -1,7 +1,7 @@
 .navbar-main {
   padding-left:20px;
   background-color:#f5f5f5 !important;
-  font-family: 'Spartan';
+  font-family:'Spartan';
 }
 
 .nav-item {
@@ -9,8 +9,16 @@
   color:black !important;
 }
 
+.nav-brand {
+  font-family:'Share Tech Mono';
+  text-transform:uppercase;
+}
+.nav-item:hover {
+  font-weight:bold;
+}
+
 .logout {
-  margin-left:20px;
+  margin-left:25px;
 }
 
 body {
@@ -177,7 +185,7 @@ body {
   display:flex;
 }
 
-.badge1, .badge2, .badge3{
+.badge0, .badge1, .badge2{
   margin-left:5px;
   padding:3px;
   font-size:12px;
@@ -187,14 +195,14 @@ body {
   color:white;
 }
 
-.badge1 {
+.badge0 {
   background-color:#4ba397;
 }
 
-.badge2 {
+.badge1 {
   background-color:#a34b51;
 }
 
-.badge3 {
+.badge2 {
   background-color:#a34b7d;
 }

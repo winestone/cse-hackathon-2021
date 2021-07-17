@@ -14,6 +14,13 @@ function dbGet<T = any>(sql: string, params: any): Promise<T> {
   }));
 }
 
+function dbAll<T = any>(sql: string, params: any): Promise<T[]> {
+  return new Promise((resolve, reject) => db.all(sql, params, (err, rows) => {
+    if (err) reject(err);
+    resolve(rows);
+  }));
+} 
+
 app.get("/api/example", (req, res) => {
   const reply: api.ExampleGetResult = "example reply";
   res.json(reply);
@@ -40,6 +47,26 @@ app.post("/api/login", async (req, res) => {
   let qry = 'SELECT username FROM users WHERE username = ?';
   const alreadyRegistered = await dbGet(qry, [args.name]);
   const reply: api.LoginResult = { success: alreadyRegistered }; 
+  res.json(reply);
+})
+
+app.post("/api/getUA", async (req, res) => {
+  const args: api.User = req.body;
+  let qry = "SELECT achievements FROM achievements WHERE username = ?";
+  //let achieveList = undefined;
+  console.log(args.name);
+  const achieveList = await dbAll(qry, [args.name]);
+  console.log(achieveList);
+  //db.all(qry, [args.name], (err, row) => {  
+  //  if (err) {
+  //    console.log(err);
+  //  } else {
+  //    console.log(row);
+  //    console.log(typeof(row));
+  //    achieveList = row;
+  //  }
+  //})
+  const reply: api.userAchievements = { achievements: achieveList }
   res.json(reply);
 })
 

@@ -18,7 +18,7 @@ export default function Login (props: LoginProps) {
     const res = await api.loginUser({name:username});
     if (res.success) {
       props.setUsername(username);
-      history.push('/home');  
+      history.push('/profile');  
       setLoginErr(false);
     } else {
       setLoginErr(true);
