@@ -1,27 +1,42 @@
 import React, { useEffect } from "react";
 import ReactDOM from "react-dom";
 
+import Home from './pages/homePage'; 
+import NavbarComp from './components/navbar';
+import Login from './pages/loginPage';
+import Register from './pages/registerPage';
+
 import * as api from "@common/api";
 
-function App(): JSX.Element {
-  const [exampleGetResult, setExampleGetResult] = React.useState<string | undefined>();
-  const [examplePostResult, setExamplePostResult] = React.useState<string | undefined>();
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+} from 'react-router-dom';
 
-  useEffect(() => {
-    (async () => {
-      setExampleGetResult(JSON.stringify(await api.exampleGet()));
-    })();
-    (async () => {
-      setExamplePostResult(JSON.stringify(await api.examplePost({})));
-    })();
-  }, []);
+function App(): JSX.Element {
 
   return (
     <>
-      <div>api.exampleGet: {exampleGetResult === undefined ? "Loading ..." : exampleGetResult}</div>
+      <Router>
+        <header> 
+          <NavbarComp />
+        </header> 
       <div>
-        api.examplePost: {examplePostResult === undefined ? "Loading ..." : examplePostResult}
+        <Switch>
+          <Route path="/home">
+            <Home />
+          </Route>
+          <Route path="/login">
+            <Login />
+          </Route>
+          <Route path="/register">
+            <Register />
+          </Route>
+        </Switch>
       </div>
+    </Router>
+
     </>
   );
 }
