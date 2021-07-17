@@ -17,17 +17,7 @@ body {
   font-family: 'Spartan';
 }
 
-.title {
-  margin-top:100px;
-  font-family:'Share Tech Mono';
-  font-size:100px;
-}
 
-.subtitle {
-  font-family:'Space Grotesk';
-  font-size:30px;
-  margin-bottom:15px;
-}
 
 .register-button {
   background-color:#4ba397;
@@ -102,4 +92,30 @@ body {
   font-size:15px;
   font-family:'Space Grotesk';
   margin-bottom:20px;
+}
+
+/* HOME PAGE */
+
+.home-container {
+  background-image:url('./home.png');
+  background-color: #a3c6ea;
+  background-position: left;
+  background-repeat: no-repeat;
+  background-size: cover;
+  min-height: 100vh;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.title {
+  font-family:'Share Tech Mono';
+  font-size:100px;
+}
+
+.subtitle {
+  font-family:'Space Grotesk';
+  font-size:30px;
+  margin-bottom:15px;
 }

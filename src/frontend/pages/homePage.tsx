@@ -13,10 +13,9 @@ export default function Home() {
 
   return (
     <>
-      <Container>
+      <Container fluid className="home-container">
         <Row>
           <Col md={2}></Col>
-
           <Col md={8}>
             <h1 className="title">GAMIFY</h1>
             <h3 className="subtitle">Make an account to start playing</h3>
