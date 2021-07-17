@@ -8,25 +8,34 @@ export default function NavbarComp() {
 //
   let userName = sessionStorage.getItem('username');
   console.log(userName);
+  const history = useHistory();
 
   //Track changes to session storage to re render 
 
+
+  const handleLogout = () => {
+    sessionStorage.removeItem('username');
+    history.push('/home')
+  }
+
   return (
     <>
+
       <Navbar expand="lg" className="navbar-main">
-        <Navbar.Brand as={Link} to="/">Gamify</Navbar.Brand>
+        <Navbar.Brand as={Link} to="/" className="nav-item"><b>Gamify</b></Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="mr-auto">
-            <Nav.Link as={Link} to="/home">Home</Nav.Link>
+          <Nav className="mr-auto container-fluid">
+            <Nav.Link as={Link} to="/home" className="nav-item">Home</Nav.Link>
             {!userName && (
               <>
-              <Nav.Link as={Link} to="/login">Login</Nav.Link>
-              <Nav.Link as={Link} to="/register">Register</Nav.Link>
+              <Nav.Link as={Link} to="/login" className="nav-item">Login</Nav.Link>
               </>
             )}
             {userName && (
-            <Button variant="warning" size="sm" name="logOut">Logout</Button>
+              <>
+              <Button variant="dark" size="sm" name="logOut" className="logout" onClick={handleLogout}> Logout</Button>
+            </>
             )}
           </Nav>
         </Navbar.Collapse>

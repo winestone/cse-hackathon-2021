@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Button, Form, Container, Row, Col } from 'react-bootstrap';
 import { useHistory } from 'react-router-dom';
 
-
 export default function Register () {
   const [username, setUsername] = useState(''); 
   const history = useHistory();
@@ -20,23 +19,33 @@ export default function Register () {
  
   return (
     <>
-      <Container fluid>
-        <h1>Register</h1>
-        <Form onSubmit={handleSubmit}>
-          <Form.Group className="mb-3">
-            <Form.Label>Enter username</Form.Label>
-            <Form.Control
-              name="name"
-              type="text"
-              placeholder="Enter username"
-              onChange={(e) => setUsername(e.target.value)}
-            />          
-            </Form.Group>
+      <Container fluid className="register-container">
+        <Row>
+          <Col md={6}></Col>
+          <Col md={6}>
+            <div className="register-form-div">
+            <Form onSubmit={handleSubmit} className="register-form">
+            <h3 className="form-title">JOIN NOW</h3>
+            <h6 className="register-subtitle">Simply register with a username and start playing for free!</h6>
 
-          <Button variant="primary" type="submit">
-            Submit
-          </Button>
-        </Form>
+            <Form.Group className="mb-3">
+              <Form.Control
+                name="name"
+                type="text"
+                placeholder="username"
+                onChange={(e) => setUsername(e.target.value)}
+              />          
+              </Form.Group>
+            <div className="register-bottom">
+            <button className="register-form-button" type="submit">
+              Register!
+            </button>
+            </div>
+          </Form>
+        </div>
+
+          </Col>
+        </Row>
       </Container>
     </>
   );

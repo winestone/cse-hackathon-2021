@@ -33,6 +33,9 @@ function App(): JSX.Element {
           <Route path="/register">
             <Register />
           </Route>
+          <Route path="/">
+            <Home />
+          </Route>
         </Switch>
       </div>
     </Router>
