@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Button, Form, Container, Row, Col } from 'react-bootstrap';
 import { useHistory } from 'react-router-dom';
+import * as api from "@common/api";
+
 
 export interface RegisterProps {
   setUsername: (username: string) => void;
@@ -10,11 +12,17 @@ export default function Register (props: RegisterProps) {
   const history = useHistory();
 
 
-  const handleSubmit = (event: any) => {
+  const handleSubmit = async (event: any) => {
     event.preventDefault();
-    props.setUsername(username);
-    // sessionStorage.setItem('username', username);
-    history.push('/profile');
+
+    const res = await api.registerUser({name:username});
+    console.log(res);
+    if (res.success) {
+      props.setUsername(username);
+      // sessionStorage.setItem('username', username);
+      history.push('/profile');  
+    }
+    
 
     //Add username to database 
   }
