@@ -2,19 +2,21 @@ import React, { useState } from 'react';
 import { Button, Form, Container, Row, Col } from 'react-bootstrap';
 import { useHistory } from 'react-router-dom';
 
-export default function Register () {
+export interface RegisterProps {
+  setUsername: (username: string) => void;
+}
+export default function Register (props: RegisterProps) {
   const [username, setUsername] = useState(''); 
   const history = useHistory();
 
 
   const handleSubmit = (event: any) => {
     event.preventDefault();
-    sessionStorage.setItem('username', username);
+    props.setUsername(username);
+    // sessionStorage.setItem('username', username);
     history.push('/home');
 
     //Add username to database 
-
-    
   }
  
   return (

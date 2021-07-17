@@ -1,10 +1,21 @@
 import React, { useState } from 'react';
 import { Button, Form, Container, Row, Col } from 'react-bootstrap';
+import { useHistory } from 'react-router-dom';
 
-export default function Login () {
+export interface LoginProps {
+  setUsername: (username: string) => void;
+}
+
+export default function Login (props: LoginProps) {
   const [username, setUsername] = useState('');
+  const history = useHistory();
+
  
-  const handleSubmit = () => {
+  const handleSubmit = (event:any) => {
+    event.preventDefault();
+    props.setUsername(username);
+    history.push('/home');
+
     //check with database 
   }
 

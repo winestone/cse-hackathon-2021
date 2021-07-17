@@ -17,8 +17,6 @@ body {
   font-family: 'Spartan';
 }
 
-
-
 /* register page */
 .register-container {
   background-image:url('./register.png');
@@ -109,27 +107,16 @@ body {
 }
 
 /*buttons */
-.register-button:hover {
+.register-button {
   background-color:#4ba397;
   color:white;
   border:none;
 }
 
-.register-button {
-  background-color:white;
-  border: 1px solid #4ba397;
-  color:#4ba397;
-}
-
 .about-button {
-  background-color:white;
-  color:#a34b51;
-  border:1px solid #a34b51;
-}
-
-.about-button:hover {
   background-color:#a34b51;
   color:white;
+  border:none;
 }
 
 .register-button, .about-button {
@@ -139,6 +126,9 @@ body {
   font-family:'Space Grotesk';
 }
 
+.register-button:hover, .about-button:hover {
+  opacity:0.8;
+}
 /* LOGIN*/
 .login-container {
   background-image:url('./login.png');

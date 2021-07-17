@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 
 import Home from './pages/homePage'; 
@@ -15,12 +15,27 @@ import {
 } from 'react-router-dom';
 
 function App(): JSX.Element {
+  const [username, setUsername] = useState<string | undefined>()
+
+  useEffect(() => {
+    setUsername(window.sessionStorage.getItem("username") ?? undefined);
+  }, []);
+
+  const changeUsername = (username: string) => {
+    sessionStorage.setItem('username', username);
+    setUsername(username);
+  }
+
+  const clearUsername = () => {
+    sessionStorage.removeItem('username');
+    setUsername(undefined);
+  }
 
   return (
     <>
       <Router>
         <header> 
-          <NavbarComp />
+          <NavbarComp username={username} clearUsername={clearUsername}/>
         </header> 
       <div>
         <Switch>
@@ -28,10 +43,10 @@ function App(): JSX.Element {
             <Home />
           </Route>
           <Route path="/login">
-            <Login />
+            <Login setUsername={changeUsername}/>
           </Route>
           <Route path="/register">
-            <Register />
+            <Register setUsername={changeUsername}/>
           </Route>
           <Route path="/">
             <Home />

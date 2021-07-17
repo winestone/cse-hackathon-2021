@@ -2,12 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { Nav, Navbar, Button, Container } from 'react-bootstrap';
 import { Link, useHistory } from 'react-router-dom';
 
+export interface NavbarCompProps {
+  username?: string;
+  clearUsername: () => void;
+}
 
-export default function NavbarComp() {
-  const [username, setUsername] = useState('');
-//
-  let userName = sessionStorage.getItem('username');
-  console.log(userName);
+export default function NavbarComp({ username, clearUsername }: NavbarCompProps) {
+//   const [username, setUsername] = useState('');
+// //
+//   let userName = sessionStorage.getItem('username');
+//   console.log(userName);
   const history = useHistory();
 
   //window.addEventListener('storage',(e) => {
@@ -24,7 +28,8 @@ export default function NavbarComp() {
 
 
   const handleLogout = () => {
-    sessionStorage.removeItem('username');
+    //sessionStorage.removeItem('username');
+    clearUsername();
     history.push('/home')
   }
 
@@ -37,12 +42,12 @@ export default function NavbarComp() {
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="mr-auto container-fluid">
             <Nav.Link as={Link} to="/home" className="nav-item">Home</Nav.Link>
-            {username === '' && (
+            {!username && (
               <>
               <Nav.Link as={Link} to="/login" className="nav-item">Login</Nav.Link>
               </>
             )}
-            {username !== '' && (
+            {username && (
               <>
               <Button variant="dark" size="sm" name="logOut" className="logout" onClick={handleLogout}> Logout</Button>
             </>
