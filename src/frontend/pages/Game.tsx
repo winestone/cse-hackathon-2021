@@ -2,10 +2,12 @@ import * as either from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/function";
 import React, { useEffect, useState } from "react";
 import useWebSocket, { ReadyState } from "react-use-websocket";
+import { useHistory } from "react-router";
 
 import * as game from "@common/game";
 import * as gameMsg from "@common/game-msg";
 import { Username } from "@common/common";
+import { GameMath } from "./GameMath";
 
 const LobbyComponent = ({
   lobby,
@@ -13,12 +15,14 @@ const LobbyComponent = ({
   showLeaveButton,
   onJoinClick,
   onLeaveClick,
+  onReadyClick,
 }: {
   lobby: game.Lobby;
   showJoinButton?: boolean;
   showLeaveButton?: boolean;
   onJoinClick?: () => void;
   onLeaveClick?: () => void;
+  onReadyClick?: () => void;
 }) => {
   return (
     <div style={{ border: "1px solid black" }}>
@@ -30,7 +34,7 @@ const LobbyComponent = ({
         .map(([playerUsername, ready]) => (
           <div key={playerUsername}>
             <p>{playerUsername}</p>
-            <p>{ready}</p>
+            {ready ? <p>Ready</p> : <p>Not Ready</p>}
           </div>
         ))}
       {showJoinButton ? (
@@ -39,9 +43,14 @@ const LobbyComponent = ({
         </button>
       ) : null}
       {showLeaveButton ? (
-        <button type="button" onClick={onLeaveClick}>
-          Leave Lobby
-        </button>
+        <>
+          <button type="button" onClick={onReadyClick}>
+            Ready!
+          </button>
+          <button type="button" onClick={onLeaveClick}>
+            Leave Lobby
+          </button>
+        </>
       ) : null}
     </div>
   );
@@ -52,6 +61,8 @@ export interface GameProps {
 }
 export function Game({ username }: GameProps): JSX.Element {
   const [lobbiesState, setLobbiesState] = useState<game.LobbiesState | undefined>();
+  const [anyGame, setAnyGame] = useState<game.AnyGame | undefined>();
+
   const {
     sendJsonMessage,
   }: {
@@ -67,6 +78,7 @@ export function Game({ username }: GameProps): JSX.Element {
         switch (msg.type) {
           case gameMsg.ServerMessageType.Init:
             setLobbiesState(gameMsg.lobbiesStateDecode(msg.lobbiesState));
+            // if (msg.game !== undefined) setAnyGame(game);
             break;
           case gameMsg.ServerMessageType.Lobby:
             {
@@ -74,7 +86,35 @@ export function Game({ username }: GameProps): JSX.Element {
               setLobbiesState((prevLobbiesState) =>
                 prevLobbiesState === undefined
                   ? undefined
-                  : game.lobbiesApplyAction(prevLobbiesState, action) ?? prevLobbiesState
+                  : game.lobbiesActionResultGetState(
+                      game.lobbiesApplyAction(prevLobbiesState, action)
+                    ) ?? prevLobbiesState
+              );
+            }
+            break;
+          case gameMsg.ServerMessageType.GameNew:
+            setAnyGame({
+              type: game.GameType.Math,
+              state: game.mathStateNew({
+                prng: msg.prng,
+                usernames: msg.players,
+                difficulty: game.MathDifficulty.Grade10,
+                height: 10,
+                columns: [
+                  game.MathQuestionType.ComputeGcd,
+                  game.MathQuestionType.ComputeLargestPrimeFactor,
+                  game.MathQuestionType.ComputeLcm,
+                  game.MathQuestionType.ComputeSimple,
+                  game.MathQuestionType.FindOperations,
+                ],
+              }),
+            });
+            break;
+          case gameMsg.ServerMessageType.Game:
+            {
+              const { action } = msg;
+              setAnyGame((prevAnyGame) =>
+                prevAnyGame === undefined ? undefined : game.anyGameApplyAction(prevAnyGame, action)
               );
             }
             break;
@@ -89,7 +129,22 @@ export function Game({ username }: GameProps): JSX.Element {
 
   return (
     <>
-      <p>Game with {username}|</p>
+      <p>Game with {username}</p>
+      {anyGame !== undefined ? (
+        <GameMath
+          username={username}
+          state={anyGame.state}
+          onGuess={(guess) =>
+            sendJsonMessage({
+              type: gameMsg.ClientMessageType.Game,
+              action: {
+                type: game.GameType.Math,
+                action: { type: game.MathUserActionType.Guess, guess },
+              },
+            })
+          }
+        />
+      ) : null}
       {lobbiesState === undefined ? (
         "Loading"
       ) : (
@@ -116,6 +171,15 @@ export function Game({ username }: GameProps): JSX.Element {
                     sendJsonMessage({
                       type: gameMsg.ClientMessageType.Lobby,
                       action: { type: game.LobbiesUserActionType.Leave },
+                    })
+                  }
+                  onReadyClick={() =>
+                    sendJsonMessage({
+                      type: gameMsg.ClientMessageType.Lobby,
+                      action: {
+                        type: game.LobbiesUserActionType.SetReady,
+                        ready: !(lobby.players.get(username) ?? true),
+                      },
                     })
                   }
                 />
@@ -145,6 +209,7 @@ export function GameWrapper(): JSX.Element {
   // text box for username
   const [username, setUsername] = useState<string>("");
   const [connected, setConnected] = useState<boolean>(false);
+  const history = useHistory();
   return (
     <>
       {connected ? (
@@ -157,6 +222,9 @@ export function GameWrapper(): JSX.Element {
           </label>
           <button type="button" onClick={() => setConnected(true)}>
             Connect
+          </button>
+          <button type="button" onClick={() => history.push("/client")}>
+            Back to home
           </button>
         </>
       )}

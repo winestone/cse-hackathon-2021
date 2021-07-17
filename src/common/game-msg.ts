@@ -18,6 +18,7 @@ export interface LobbiesState {
 export enum ClientMessageType {
   Login,
   Lobby,
+  Game,
 }
 
 export interface ClientMessageLogin {
@@ -30,16 +31,25 @@ export interface ClientMessageLobby {
   action: game.LobbiesUserAction;
 }
 
-export type ClientMessage = ClientMessageLogin | ClientMessageLobby;
+export interface ClientMessageGame {
+  type: ClientMessageType.Game;
+  action: game.AnyGameUserAction;
+}
+
+export type ClientMessage = ClientMessageLogin | ClientMessageLobby | ClientMessageGame;
 
 export enum ServerMessageType {
   Init,
   Lobby,
+  GameNew,
+  Game,
 }
 
 export interface ServerMessageInit {
   type: ServerMessageType.Init;
   lobbiesState: LobbiesState;
+  // TODO: serialize game
+  game?: game.AnyGame;
 }
 
 export interface ServerMessageLobby {
@@ -47,7 +57,22 @@ export interface ServerMessageLobby {
   action: game.LobbiesAction;
 }
 
-export type ServerMessage = ServerMessageInit | ServerMessageLobby;
+export interface ServerMessageGameNew {
+  type: ServerMessageType.GameNew;
+  prng: game.PrngState;
+  players: Username[];
+}
+
+export interface ServerMessageGame {
+  type: ServerMessageType.Game;
+  action: game.AnyGameAction;
+}
+
+export type ServerMessage =
+  | ServerMessageInit
+  | ServerMessageLobby
+  | ServerMessageGameNew
+  | ServerMessageGame;
 
 export function lobbyEncode(lobby: game.Lobby): Lobby {
   return {
