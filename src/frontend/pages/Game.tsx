@@ -3,6 +3,7 @@ import { pipe } from "fp-ts/lib/function";
 import React, { useEffect, useState } from "react";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 import { useHistory } from "react-router";
+import { Container, Row, Col, Card } from "react-bootstrap";
 
 import * as game from "@common/game";
 import * as gameMsg from "@common/game-msg";
@@ -25,33 +26,40 @@ const LobbyComponent = ({
   onReadyClick?: () => void;
 }) => {
   return (
-    <div style={{ border: "1px solid black" }}>
-      <p>New Lobby</p>
-      <p>Players in this lobby: </p>
-      {lobby.players
+    
+    <div className='game-card'>
+      <Card className="text-center">
+        <Card.Header className="card-header">New Lobby</Card.Header>
+        <Card.Body>
+        <Card.Text>
+        {lobby.players
         .entrySeq()
         .sortBy(([playerUsername]) => playerUsername)
         .map(([playerUsername, ready]) => (
           <div key={playerUsername}>
-            <p>{playerUsername}</p>
-            {ready ? <p>Ready</p> : <p>Not Ready</p>}
+            <p>{playerUsername}: {ready ? <span>Ready</span> : <span>Not ready</span>}</p>
           </div>
         ))}
       {showJoinButton ? (
-        <button type="button" onClick={onJoinClick}>
+        <button type="button" className="play-button" onClick={onJoinClick}>
           Join Lobby
         </button>
       ) : null}
       {showLeaveButton ? (
         <>
-          <button type="button" onClick={onReadyClick}>
+          <button type="button" className="lobby-button" onClick={onReadyClick}>
             Ready!
           </button>
-          <button type="button" onClick={onLeaveClick}>
+          <br />
+          <button type="button" className="leave-button" onClick={onLeaveClick}>
             Leave Lobby
           </button>
         </>
       ) : null}
+        </Card.Text>
+        </Card.Body>
+      </Card>
+
     </div>
   );
 };
@@ -129,7 +137,11 @@ export function Game({ username }: GameProps): React.ReactElement {
 
   return (
     <>
-      <p>Game with {username}</p>
+    <Container>
+      <Row>
+          <Col md={2}></Col>
+          <Col md={8} className="lobby-div">
+      <h1 className="lobby-title">Games:</h1>
       {anyGame !== undefined ? (
         <GameMath
           username={username}
@@ -150,7 +162,7 @@ export function Game({ username }: GameProps): React.ReactElement {
       ) : (
         <>
           {lobbiesState.nextLobbyId === 1 ? (
-            <p>There are no lobbies currently. Why don&apos;t you make one?</p>
+            <p className="lobby-subtitle">There are no lobbies currently. Why don&apos;t you make one?</p>
           ) : (
             lobbiesState.lobbies
               .valueSeq()
@@ -188,6 +200,7 @@ export function Game({ username }: GameProps): React.ReactElement {
           {userLobby !== undefined ? null : (
             <button
               type="button"
+              className="lobby-button"
               onClick={() =>
                 sendJsonMessage({
                   type: gameMsg.ClientMessageType.Lobby,
@@ -200,6 +213,10 @@ export function Game({ username }: GameProps): React.ReactElement {
           )}
         </>
       )}
+      </Col>
+      <Col md={2}></Col>
+      </Row>
+      </Container>
     </>
   );
 }

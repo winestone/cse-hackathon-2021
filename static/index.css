@@ -206,3 +206,55 @@ body {
 .badge2 {
   background-color:#a34b7d;
 }
+
+/* LOBBY page */
+.lobby-div {
+  text-align:center;
+}
+
+.lobby-title {
+  font-family:'Share Tech Mono';
+  margin-top:20px;
+  font-size:60px;
+}
+
+.lobby-subtitle {
+  font-family:'Space Grotesk';
+  font-size:20px;
+}
+
+.lobby-button, .play-button, .leave-button {
+  color:white;
+  border-radius:5px;
+  font-family:'Space Grotesk';
+  border:none;
+  padding:6px;
+  font-size:14px;
+  margin-bottom:10px;
+
+}
+.lobby-button {
+  background-color:#4ba397;
+}
+
+.lobby-button:hover, .play-button:hover, .leave-button:hover {
+  opacity:0.7;
+}
+
+.leave-button {
+  background-color:#a34b51;
+}
+
+.play-button{
+  background-color:#a34b7d;
+}
+
+.game-card {
+  margin-bottom:20px;
+  font-family:'Space Grotesk';
+}
+
+.card-header {
+  font-size:30px;
+}
+
