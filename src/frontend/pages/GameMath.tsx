@@ -49,22 +49,26 @@ export function GameMathCell({ cell }: GameMathCellProps): React.ReactElement {
 
 export interface GameMathPlayerGridProps {
   grid: game.Grid2<game.MathCell | undefined>;
-  nextDropCols: number[];
+  nextDropByCol: number[];
+  currDropByCol: number[];
   isMe: boolean;
 }
 export function GameMathPlayerGrid({
   grid,
-  nextDropCols,
+  nextDropByCol,
+  currDropByCol,
   isMe,
 }: GameMathPlayerGridProps): React.ReactElement {
-  const nextDropColsSet = immutable.Set(nextDropCols);
   return (
     <>
       <table>
         <tbody>
           <tr>
             {_.range(grid.size[0]).map((col) => (
-              <td key={col}>{nextDropColsSet.has(col) ? "v" : ""}</td>
+              <td key={col}>
+                <strong>{"V".repeat(currDropByCol[col])}</strong>
+                {"v".repeat(nextDropByCol[col])}
+              </td>
             ))}
           </tr>
           {_.rangeRight(grid.size[1]).map((y) => (
@@ -96,7 +100,12 @@ export function GameMathPlayer({ player, isMe }: GameMathPlayerProps): React.Rea
         {/* {player.username} */}
         {player.hasLost ? " lost" : ""}
       </p>
-      <GameMathPlayerGrid grid={player.grid} nextDropCols={player.nextDropCols} isMe={isMe} />
+      <GameMathPlayerGrid
+        grid={player.grid}
+        nextDropByCol={player.nextDropByCol}
+        currDropByCol={player.currDropByCol}
+        isMe={isMe}
+      />
     </div>
   );
 }
@@ -132,7 +141,7 @@ export function GameMath({ username, state, onGuess }: GameMathProps): React.Rea
       <br />
       <br />
       <form onSubmit={handleSubmit}>
-        <input type="text" onChange={(e) => setGuess(e.target.value)} value={guess} />
+        <input type="text" onChange={(e) => setGuess(e.target.value)} autoFocus value={guess} />
         <input type="submit" />
       </form>
     </>

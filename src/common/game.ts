@@ -490,7 +490,8 @@ export interface MathPlayer {
   username: Username;
   grid: Grid2<MathCell | undefined>;
   hasLost: boolean;
-  nextDropCols: number[];
+  nextDropByCol: number[];
+  currDropByCol: number[];
 }
 
 export interface MathState {
@@ -558,7 +559,7 @@ export interface MathStateNewArgs {
 export function mathStateNew(args: MathStateNewArgs): MathState {
   const prng = PrngMut.mk(args.prng);
   const players = immutable.Map<Username, MathPlayer>(
-    args.usernames.map((playerUsername) => {
+    args.usernames.map((playerUsername): [Username, MathPlayer] => {
       const nextDropCols = prng.nextSampleIndexes(args.columns.length, 3);
       return [
         playerUsername,
@@ -566,7 +567,11 @@ export function mathStateNew(args: MathStateNewArgs): MathState {
           username: playerUsername,
           grid: Grid2.fromValue(IVec2.fromValues(args.columns.length, args.height), undefined),
           hasLost: false,
-          nextDropCols,
+          nextDropByCol: nextDropCols.reduce((acc, dropCol) => {
+            acc[dropCol]++;
+            return acc;
+          }, _.range(args.columns.length).fill(0)),
+          currDropByCol: _.range(args.columns.length).fill(0),
         },
       ];
     })
@@ -595,7 +600,7 @@ export function mathStateTick(state: MathState): MathState {
   if (mathStateIsFinished(state)) return state;
 
   const prng = PrngMut.mk(state.prng);
-  const shouldDrop = state.ticksTillNextDrop <= 0;
+  const shouldDropNext = state.ticksTillNextDrop <= 0;
 
   const players = state.players.map((player) => {
     if (player.hasLost) return player;
@@ -612,20 +617,31 @@ export function mathStateTick(state: MathState): MathState {
       });
     });
 
-    const nextDropAts = player.nextDropCols.map((col) => IVec2.fromValues(col, grid.size[1] - 1));
-    const hasLost = shouldDrop && nextDropAts.some((at) => grid.get(at) !== undefined);
-    if (shouldDrop && !hasLost) {
-      nextDropAts.forEach((at) => grid.set(at, mathCellRandomMut(prng)));
-    }
+    const currDrops = shouldDropNext
+      ? player.currDropByCol.map((curr, x) => curr + player.nextDropByCol[x])
+      : player.currDropByCol;
 
-    const nextDropCols =
-      shouldDrop && !hasLost ? prng.nextSampleIndexes(grid.size[0], 3) : player.nextDropCols;
+    const currDropAts = Array.from(currDrops.entries())
+      .filter(([, curr]) => 0 < curr)
+      .map(([x]) => IVec2.fromValues(x, grid.size[1] - 1));
+
+    const hasLost = currDropAts.some((at) => grid.get(at) !== undefined);
+    // drop stuff
+    if (!hasLost) currDropAts.forEach((at) => grid.set(at, mathCellRandomMut(prng)));
 
     return {
       ...player,
       hasLost,
       grid,
-      nextDropCols,
+      nextDropByCol: (() => {
+        if (!shouldDropNext || hasLost) return player.nextDropByCol;
+        const nextDropCols = prng.nextSampleIndexes(grid.size[0], 3);
+        return nextDropCols.reduce((acc, dropCol) => {
+          acc[dropCol]++;
+          return acc;
+        }, _.range(state.columns.length).fill(0));
+      })(),
+      currDropByCol: currDrops.map((curr) => Math.max(0, curr - 1)),
     };
   });
   return {
@@ -643,24 +659,22 @@ export function mathStateGuess(
 ): MathState | undefined {
   const player = state.players.get(username);
   if (player === undefined) return undefined;
+  const prng = PrngMut.mk(state.prng);
   const grid = player.grid.map((cell) =>
     cell === undefined ? undefined : mathCellCheckGuess(cell, guess) ?? cell
   );
   const isAnswered = (at: ConstIVec2): boolean => grid.get(at)?.answer !== undefined;
-  // for each row, if all solved, clear row
-  _.range(player.grid.size[1]).forEach((y) => {
-    const rowAts = _.range(player.grid.size[0]).map((x) => IVec2.fromValues(x, y));
-    if (rowAts.every(isAnswered)) {
-      rowAts.forEach((at) => grid.set(at, undefined));
-    }
-  });
-  // for each column, find any stretch of cells greater than 3 and clear them
+  // for each row, check if all solved
+  const rowsSolved = _.range(player.grid.size[1])
+    .map((y) => _.range(player.grid.size[0]).map((x) => IVec2.fromValues(x, y)))
+    .filter((rowAts) => rowAts.every(isAnswered));
+  // for each column, find any stretch of cells greater than 3
+  const colsSolved: ConstIVec2[][] = [];
   _.range(player.grid.size[0]).forEach((x) => {
     let stretch = 0;
     const checkStretchEndingAt = (endY: number) => {
-      if (3 <= stretch) {
-        _.range(endY - stretch, endY).forEach((y) => grid.set(IVec2.fromValues(x, y), undefined));
-      }
+      if (3 <= stretch)
+        colsSolved.push(_.range(endY - stretch, endY).map((y) => IVec2.fromValues(x, y)));
     };
     _.range(player.grid.size[1]).forEach((y) => {
       const answered = isAnswered(IVec2.fromValues(x, y));
@@ -669,12 +683,35 @@ export function mathStateGuess(
     });
     checkStretchEndingAt(player.grid.size[1]);
   });
-  return {
-    ...state,
-    players: state.players.set(username, {
+  rowsSolved.forEach((ats) => ats.forEach((at) => grid.set(at, undefined)));
+  colsSolved.forEach((ats) => ats.forEach((at) => grid.set(at, undefined)));
+  const linesToSend =
+    state.players.size <= 1
+      ? 0
+      : rowsSolved.length +
+        colsSolved.map((colsAt) => colsAt.length - 2).reduce((a, b) => a + b, 0);
+  const usersToSend = state.players
+    .keySeq()
+    .filter((playerUsername) => playerUsername !== username)
+    .toArray();
+  const players = _.range(linesToSend).reduce(
+    (ps) => {
+      const p =
+        ps.get(usersToSend[prng.nextIntBetween(0, usersToSend.length)]) ??
+        utils.exprThrow<MathPlayer>();
+      const nextDropByCol = p.nextDropByCol.slice();
+      nextDropByCol[prng.nextIntBetween(0, grid.size[0])]++;
+      return ps.set(p.username, { ...p, nextDropByCol });
+    },
+    state.players.set(username, {
       ...player,
       grid,
-    }),
+    })
+  );
+  return {
+    ...state,
+    prng: prng.state,
+    players,
   };
 }
 
