@@ -207,6 +207,32 @@ body {
   background-color:#a34b7d;
 }
 
+.profile-text {
+  font-family:'Space Grotesk';
+  margin-top:20px;
+}
+
+.progress {
+  min-height:20px;
+  margin-bottom:10px;
+}
+
+.progress-1 .progress-bar {
+  background-color:#4ba397 !important;
+}
+
+.progress-2 .progress-bar {
+  background-color:#a34b51;
+}
+
+.progress-3 .progress-bar {
+  background-color:#a34b7d;
+}
+
+.progress-4 .progres-bar {
+  background-color:#4b57a3;
+}
+
 /* LOBBY page */
 .lobby-div {
   text-align:center;
