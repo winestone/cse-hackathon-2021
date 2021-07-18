@@ -54,7 +54,7 @@ module.exports = {
         extensions: [".js", ".ts", ".tsx"],
       },
     ],
-    "react/require-default-props": "warn",
+    "react/require-default-props": "off",
     "react/prop-types": "off",
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn",
