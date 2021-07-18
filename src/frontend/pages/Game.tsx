@@ -29,7 +29,6 @@ const LobbyComponent = ({
     
     <div className='game-card'>
       <Card className="text-center">
-        <Card.Header className="card-header">New Lobby</Card.Header>
         <Card.Body>
         <Card.Text>
         {lobby.players
