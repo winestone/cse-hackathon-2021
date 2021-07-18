@@ -504,15 +504,42 @@ export interface MathState {
 }
 
 export function mathCellRandomMut(prng: PrngMut): MathCell {
-  return {
-    type: MathQuestionType.ComputeSimple,
-    question: {
-      tree: {
-        op: MathOp.Add,
-        childs: [prng.nextIntBetween(0, 100), prng.nextIntBetween(0, 100)],
-      },
-    },
-  };
+  const choice = prng.nextIntBetween(0, 4);
+  switch (choice) {
+    case 0:
+    case 1:
+      return {
+        type: MathQuestionType.ComputeSimple,
+        question: {
+          tree: {
+            op: choice === 0 ? MathOp.Add : MathOp.Sub,
+            childs: [prng.nextIntBetween(0, 101), prng.nextIntBetween(0, 101)],
+          },
+        },
+      };
+    case 2:
+      return {
+        type: MathQuestionType.ComputeSimple,
+        question: {
+          tree: {
+            op: MathOp.Mul,
+            childs: [prng.nextIntBetween(0, 17), prng.nextIntBetween(0, 17)],
+          },
+        },
+      };
+    default: {
+      const common = prng.nextIntBetween(0, 17);
+      return {
+        type: MathQuestionType.ComputeSimple,
+        question: {
+          tree: {
+            op: MathOp.Div,
+            childs: [prng.nextIntBetween(0, 17) * common, common],
+          },
+        },
+      };
+    }
+  }
 }
 
 function mathQuestionComputeSimpleTreeAnswer(q: MathQuestionComputeSimpleTree): number {
