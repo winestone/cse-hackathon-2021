@@ -9,9 +9,7 @@ import * as gameMsg from "@common/game-msg";
 import { Username } from "@common/common";
 import { IVec2 } from "@common/ivec2";
 
-function gameMathQuestionComputeSimpleTreeToString(
-  q: game.MathQuestionComputeSimpleTreeAddSub | game.MathQuestionComputeSimpleTreeMulDiv | number
-): string {
+function gameMathQuestionComputeSimpleTreeToString(q: game.MathQuestionComputeSimpleTree): string {
   if (typeof q === "number") return q.toString();
   return `${gameMathQuestionComputeSimpleTreeToString(q.childs[0])} ${
     {
@@ -93,13 +91,13 @@ export interface GameMathPlayerProps {
 }
 export function GameMathPlayer({ player, isMe }: GameMathPlayerProps): React.ReactElement {
   return (
-    <>
+    <div>
       <p>
-        {player.username}
+        {/* {player.username} */}
         {player.hasLost ? " lost" : ""}
       </p>
       <GameMathPlayerGrid grid={player.grid} nextDropCols={player.nextDropCols} isMe={isMe} />
-    </>
+    </div>
   );
 }
 
@@ -109,6 +107,13 @@ export interface GameMathProps {
   onGuess?: (guess: string) => void;
 }
 export function GameMath({ username, state, onGuess }: GameMathProps): React.ReactElement {
+  const [guess, setGuess] = useState<string>("");
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    onGuess?.(guess);
+    setGuess("");
+  };
+
   return (
     <>
       <p>Game Math</p>
@@ -124,6 +129,12 @@ export function GameMath({ username, state, onGuess }: GameMathProps): React.Rea
           ))
           .toArray()}
       </div>
+      <br />
+      <br />
+      <form onSubmit={handleSubmit}>
+        <input type="text" onChange={(e) => setGuess(e.target.value)} value={guess} />
+        <input type="submit" />
+      </form>
     </>
   );
 }

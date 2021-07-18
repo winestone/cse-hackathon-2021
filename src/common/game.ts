@@ -1,6 +1,8 @@
 import * as either from "fp-ts/lib/Either";
 import type { Either } from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/function";
+import * as option from "fp-ts/lib/Option";
+import type { Option } from "fp-ts/lib/Option";
 import immutable from "immutable";
 import { SortedSet } from "immutable-sorted";
 import _ from "lodash";
@@ -447,8 +449,12 @@ export interface MathQuestionComputeSimpleTreeAddSub {
     MathQuestionComputeSimpleTreeAddSub | MathQuestionComputeSimpleTreeMulDiv | number
   ];
 }
+export type MathQuestionComputeSimpleTree =
+  | MathQuestionComputeSimpleTreeAddSub
+  | MathQuestionComputeSimpleTreeMulDiv
+  | number;
 export interface MathQuestionComputeSimple {
-  tree: MathQuestionComputeSimpleTreeAddSub;
+  tree: MathQuestionComputeSimpleTree;
 }
 export interface MathQuestionFindOperations {
   nums: number[];
@@ -508,6 +514,40 @@ export function mathCellRandomMut(prng: PrngMut): MathCell {
   };
 }
 
+function mathQuestionComputeSimpleTreeAnswer(q: MathQuestionComputeSimpleTree): number {
+  if (typeof q === "number") return q;
+  const [qa, qb] = q.childs;
+  const a = mathQuestionComputeSimpleTreeAnswer(qa);
+  const b = mathQuestionComputeSimpleTreeAnswer(qb);
+  switch (q.op) {
+    case MathOp.Add:
+      return a + b;
+    case MathOp.Sub:
+      return a - b;
+    case MathOp.Mul:
+      return a * b;
+    case MathOp.Div:
+      return a / b;
+  }
+}
+export function mathQuestionComputeSimpleAnswer(q: MathQuestionComputeSimple): number {
+  return mathQuestionComputeSimpleTreeAnswer(q.tree);
+}
+
+export function mathCellCheckGuess(cell: MathCell, guess: string): MathCell | undefined {
+  const guessFloat = option.toUndefined(option.tryCatchK(() => parseFloat(guess))());
+  switch (cell.type) {
+    case MathQuestionType.ComputeSimple: {
+      const answer = mathQuestionComputeSimpleAnswer(cell.question);
+      return guessFloat !== undefined && Math.abs(guessFloat - answer) < 0.8
+        ? { ...cell, answer }
+        : undefined;
+    }
+    default:
+      return undefined;
+  }
+}
+
 export interface MathStateNewArgs {
   prng: PrngState;
   difficulty: MathDifficulty;
@@ -541,7 +581,13 @@ export function mathStateNew(args: MathStateNewArgs): MathState {
 }
 
 export function mathStateIsFinished(state: MathState): boolean {
-  return false;
+  const anyPlayer = state.players.first();
+  return (
+    anyPlayer === undefined ||
+    (state.players.size === 1 && anyPlayer.hasLost) ||
+    (1 < state.players.size &&
+      state.players.size - state.players.filter((player) => player.hasLost).count() <= 1)
+  );
 }
 
 // 1 tick a second?
@@ -595,7 +641,41 @@ export function mathStateGuess(
   username: Username,
   guess: string
 ): MathState | undefined {
-  return state;
+  const player = state.players.get(username);
+  if (player === undefined) return undefined;
+  const grid = player.grid.map((cell) =>
+    cell === undefined ? undefined : mathCellCheckGuess(cell, guess) ?? cell
+  );
+  const isAnswered = (at: ConstIVec2): boolean => grid.get(at)?.answer !== undefined;
+  // for each row, if all solved, clear row
+  _.range(player.grid.size[1]).forEach((y) => {
+    const rowAts = _.range(player.grid.size[0]).map((x) => IVec2.fromValues(x, y));
+    if (rowAts.every(isAnswered)) {
+      rowAts.forEach((at) => grid.set(at, undefined));
+    }
+  });
+  // for each column, find any stretch of cells greater than 3 and clear them
+  _.range(player.grid.size[0]).forEach((x) => {
+    let stretch = 0;
+    const checkStretchEndingAt = (endY: number) => {
+      if (3 <= stretch) {
+        _.range(endY - stretch, endY).forEach((y) => grid.set(IVec2.fromValues(x, y), undefined));
+      }
+    };
+    _.range(player.grid.size[1]).forEach((y) => {
+      const answered = isAnswered(IVec2.fromValues(x, y));
+      if (!answered) checkStretchEndingAt(y);
+      stretch = answered ? stretch + 1 : 0;
+    });
+    checkStretchEndingAt(player.grid.size[1]);
+  });
+  return {
+    ...state,
+    players: state.players.set(username, {
+      ...player,
+      grid,
+    }),
+  };
 }
 
 export enum MathUserActionType {
